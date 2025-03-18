@@ -3,3 +3,11 @@
     name = Alexander Strebkov
 [core]
     editor = nvim
+    autocrlf = input
+[diff]
+    algorithm = histogram
+    colorMoved = plain
+    mnemonicPrefix = true
+    renames = true
+[merge]
+    conflictstyle = zdiff3
