@@ -2,6 +2,48 @@ vim.opt.nu = true
 vim.opt.expandtab = true
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
+vim.opt.completeopt = "menuone,fuzzy,longest,noselect"
+
+-- Clang
+vim.lsp.config.clangd = {
+    cmd = { 'clangd', '--background-index' },
+    root_markers = { 'compile_commands.json', 'compile_flags.txt' },
+    filetypes = { 'c', 'cpp' },
+}
+
+-- Typescript
+vim.lsp.config.tsserver = {
+    cmd = { 'typescript-language-server', '--stdio' },
+    root_markers = { 'package.json' },
+    filetypes = {
+        'javascript',
+        'javascriptreact',
+        'javascript.jsx',
+        'typescript',
+        'typescriptreact',
+        'typescript.tsx',
+    }
+}
+
+-- Enable LSP
+vim.lsp.enable({'clangd', 'tsserver'})
+
+-- Completion
+vim.api.nvim_create_autocmd('LspAttach', {
+    callback = function(ev)
+        local client = vim.lsp.get_client_by_id(ev.data.client_id)
+        if client:supports_method('textDocument/completion') then
+            vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+        end
+    end,
+})
+
+
+-- Diagnostics 
+vim.diagnostic.config({
+  -- Use the default configuration
+  virtual_lines = true
+})
 
 require("lazy").setup({
     {
@@ -26,58 +68,6 @@ require("lazy").setup({
                 incremental_selection = { enable = true }
             })
     	end
-    },
-    {
-        "neovim/nvim-lspconfig",
-        config = function()
-            local lsp_config = require("lspconfig")
-            lsp_config.zk.setup({})
-            lsp_config.lua_ls.setup({})
-            lsp_config.pyright.setup({})
-            lsp_config.clangd.setup({
-                on_attach = function(client, buffer)
-                    vim.keymap.set("n", "<F4>", ":ClangdSwitchSourceHeader<CR>", {  desc = "Switch Source/Header File" })
-                    vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
-                    vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Go to Reference" })
-                    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename Symbol" })
-                    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Actions" })
-                    vim.keymap.set("n", "<leader>f",  function()
-                        vim.lsp.buf.format({ async = false })
-                    end, { desc = "Format Code" })
-                end
-            })
-    	end
-    },
-    {
-        "hrsh7th/nvim-cmp",
-        dependencies = {
-            "hrsh7th/cmp-nvim-lsp",
-            "hrsh7th/cmp-buffer",
-            "hrsh7th/cmp-path",
-            "hrsh7th/cmp-cmdline",
-        },
-        config = function()
-            local cmp = require("cmp")
-            cmp.setup({
-                snippet = {
-                    expand = function(args)
-                        vim.snippet.expand(args.body)
-                    end
-                },
-                sources = cmp.config.sources({ 
-                    { name = "nvim_lsp" },
-                    { name = "buffer" },
-                    { name = "path" }
-                }),
-                mapping = cmp.mapping.preset.insert({
-                    ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-                    ["<C-f>"] = cmp.mapping.scroll_docs(4),
-                    ["<C-Space>"] = cmp.mapping.complete(),
-                    ["<C-e>"] = cmp.mapping.abort(),
-                    ["<CR>"] = cmp.mapping.confirm({ select = true }),
-                })
-            })
-        end
     },
     {
         "folke/which-key.nvim",
