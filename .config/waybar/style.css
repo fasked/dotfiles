@@ -1,0 +1,21 @@
+* {
+  font-family: "Fira Code Nerd Font", sans-serif;
+  font-size: 12px;
+}
+
+#waybar {
+  background: #282a36;
+  color: #f8f8f2;
+}
+
+#workspaces button {
+  color: #bd93f9;
+}
+
+#workspaces button.active {
+  background: #44475a;
+}
+
+#clock, #network, #tray, #custom-launcher {
+  padding: 0 10px;
+}
