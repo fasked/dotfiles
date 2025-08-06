@@ -2,31 +2,15 @@ vim.opt.nu = true
 vim.opt.expandtab = true
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
-vim.opt.completeopt = "menuone,fuzzy,longest,noselect"
+vim.opt.completeopt = "menuone,fuzzy,noinsert,popup,preview"
 
--- Clang
-vim.lsp.config.clangd = {
-    cmd = { 'clangd', '--background-index' },
-    root_markers = { 'compile_commands.json', 'compile_flags.txt' },
-    filetypes = { 'c', 'cpp' },
-}
+if vim.g.neovide then
+    vim.o.guifont = "MesloLGLDZ Nerd Font Mono:h10"
+    vim.g.neovide_cursor_animation_length = 0
+end
 
--- Typescript
-vim.lsp.config.tsserver = {
-    cmd = { 'typescript-language-server', '--stdio' },
-    root_markers = { 'package.json' },
-    filetypes = {
-        'javascript',
-        'javascriptreact',
-        'javascript.jsx',
-        'typescript',
-        'typescriptreact',
-        'typescript.tsx',
-    }
-}
-
--- Enable LSP
-vim.lsp.enable({'clangd', 'tsserver'})
+-- Enable LSP 
+vim.lsp.enable({"clangd", "neocmake", "jedi_language_server", "tsserver"})
 
 -- Completion
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -38,11 +22,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end,
 })
 
-
 -- Diagnostics 
 vim.diagnostic.config({
-  -- Use the default configuration
-  virtual_lines = true
+    virtual_text = true
 })
 
 require("lazy").setup({
@@ -57,6 +39,10 @@ require("lazy").setup({
     },
     {
         "sindrets/diffview.nvim"
+    },
+    {
+        "ibhagwan/fzf-lua",
+        dependencies = { "echasnovski/mini.icons" },
     },
     {
         "nvim-treesitter/nvim-treesitter",
@@ -81,5 +67,11 @@ require("lazy").setup({
                 desc = "Buffer Local Keymaps (which-key)",
             },
         },
-    }
+    },
 })
+
+vim.keymap.set('n', '<leader>ff', '<cmd>FzfLua files<cr>', { desc = "Find files" })
+vim.keymap.set('n', '<leader>fg', '<cmd>FzfLua live_grep<cr>', { desc = "Live grep" })
+vim.keymap.set('n', '<leader>fb', '<cmd>FzfLua buffers<cr>', { desc = "Find buffers" })
+vim.keymap.set('n', '<leader>fh', '<cmd>FzfLua help_tags<cr>', { desc = "Help tags" })
+
